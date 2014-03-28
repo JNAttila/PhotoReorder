@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoReorder", "PhotoReorder\PhotoReorder.csproj", "{70303446-6AE1-4A7E-A32A-9AB9F1BFF212}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderComparer", "FolderComparer\FolderComparer.csproj", "{5E1A11B3-3F69-4CFB-8901-7AC953F6729C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{70303446-6AE1-4A7E-A32A-9AB9F1BFF212}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70303446-6AE1-4A7E-A32A-9AB9F1BFF212}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70303446-6AE1-4A7E-A32A-9AB9F1BFF212}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E1A11B3-3F69-4CFB-8901-7AC953F6729C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E1A11B3-3F69-4CFB-8901-7AC953F6729C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E1A11B3-3F69-4CFB-8901-7AC953F6729C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E1A11B3-3F69-4CFB-8901-7AC953F6729C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
