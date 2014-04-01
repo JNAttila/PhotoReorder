@@ -101,7 +101,7 @@ namespace FolderComparer
             var di = new DirectoryInfo(_path);
             if (di == null || !di.Exists)
                 return false;
-            
+
             // fájlok mérete együtt
             _sumFileSize = 0;
 
@@ -131,7 +131,7 @@ namespace FolderComparer
         /// <param name="_mfi">Hasonlítandó</param>
         /// <param name="checkFileNames">fájlnévellenőrzéssel-e</param>
         /// <returns>Azonos könyvtárak-e</returns>
-        public bool Equals(MyFolderInfo _mfi = null, bool checkFileNames = true)
+        public bool AreEquals(MyFolderInfo _mfi = null, bool checkFileNames = true)
         {
             if (_mfi == null) return false;
 
