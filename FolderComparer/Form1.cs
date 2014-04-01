@@ -27,10 +27,24 @@ namespace FolderComparer
             if (di == null) return;
 
             textBox1.Text = "";
-            foreach (var x in di.EnumerateDirectories())
+            var fileColl = di.EnumerateDirectories();
+            foreach (var x in fileColl)
             {
-                textBox1.Text += x.Name + Environment.NewLine;
+                textBox1.Text += ProcessFolder(x.FullName);
             }
+        }
+
+        private string ProcessFolder(string path)
+        {
+            string result = "";
+
+            var x = new MyFolderInfo(path);
+
+            result += x.Path + Environment.NewLine;
+            result += "FileNumber = " + x.FileNumber + Environment.NewLine;
+            result += "SumFileSize = " + x.SumFileSize + Environment.NewLine;
+
+            return result;
         }
 
         private string GetFolder()
