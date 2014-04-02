@@ -32,6 +32,7 @@ namespace FolderComparer
             if (di == null) return;
 
             textBox1.Text = "";
+            myFolderInfoList.Clear();
 
             var fileColl = di.EnumerateDirectories("*", SearchOption.AllDirectories);
             foreach (var x in fileColl)

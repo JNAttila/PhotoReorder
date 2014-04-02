@@ -26,7 +26,7 @@ namespace FolderComparer
                 _path = value;
                 if (!String.IsNullOrEmpty(_path))
                 {
-                    _files = new HashSet<string>();
+                    _fileSizes = new HashSet<long>();
                     // process folder info
                     _validInfo = ProcessFolder();
                 }
@@ -63,10 +63,10 @@ namespace FolderComparer
         /// <summary>
         /// A könyvtár beli fájlok nevei
         /// </summary>
-        HashSet<string> _files = null;
-        public HashSet<string> Files
+        HashSet<long> _fileSizes = null;
+        public HashSet<long> Files
         {
-            get { return _files; }
+            get { return _fileSizes; }
         }
 
         #endregion DataMembers and GetterSetters
@@ -119,7 +119,7 @@ namespace FolderComparer
                 ++_fileNumber;
 
                 // fájlnév tárolás
-                _files.Add(x.Name);
+                _fileSizes.Add(x.Length);
             }
 
             return true;
@@ -133,15 +133,35 @@ namespace FolderComparer
         /// <returns>Azonos könyvtárak-e</returns>
         public bool AreEquals(MyFolderInfo _mfi = null, bool checkFileNames = true)
         {
+            // null paraméter
             if (_mfi == null) return false;
 
+            // különböző fájl számok
             if (_mfi.FileNumber != FileNumber) return false;
 
+            // eltérő fájlméret összeg
             if (_mfi.SumFileSize != SumFileSize) return false;
 
-            if (checkFileNames)
+            // azonos méretű fájlok
+            if (checkFileNames && !SameSizes(_mfi.Files)) return false;
+
+            // megegyezik a két könyvtár
+            return true;
+        }
+
+        /// <summary>
+        /// Fájl mértek összehasonlítása
+        /// </summary>
+        /// <param name="hs">fájlok méretei</param>
+        /// <returns>egyezőség-e</returns>
+        bool SameSizes(HashSet<long> hs)
+        {
+            // minden fájlméretre
+            foreach (var item in hs)
             {
-                //
+                // van-e ebben a struktúrában neki megfelelő
+                if (!_fileSizes.Contains(item))
+                    return false;
             }
 
             return true;
