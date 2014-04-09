@@ -19,7 +19,14 @@ namespace PhotoReorder
 
         private void button1_Click(object sender, EventArgs e)
         {
+            var fo = new OpenFileDialog();
+            string filePath = "";
+            if (fo.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                filePath = fo.FileName;
 
+            var ei = new ExifInformer(filePath);
+
+            tbResult.Text = ei.GetCreated();
         }
 
         private void button2_Click(object sender, EventArgs e)
