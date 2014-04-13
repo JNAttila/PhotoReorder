@@ -55,7 +55,7 @@ namespace PhotoReorder
         /// A fotó létrehozásának ideje
         /// </summary>
         /// <returns>dátum + idő</returns>
-        public string GetCreated()
+        public string GetCreatedString()
         {
             // http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
             // 0x9003 	DateTimeOriginal 	string 	ExifIFD 	(date/time when original image was taken)
@@ -83,5 +83,15 @@ namespace PhotoReorder
             return result;
         }
 
+        /// <summary>
+        /// Létrehozás Dátu formában
+        /// </summary>
+        /// <param name="dt">az eredmény dátum</param>
+        /// <returns>sikeres konverzió</returns>
+        public bool GetCreateDateTime(out DateTime dt)
+        {
+            var result = DateTime.TryParse(GetCreatedString(), out dt);
+            return result;
+        }
     }
 }

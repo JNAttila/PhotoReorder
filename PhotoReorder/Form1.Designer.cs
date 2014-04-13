@@ -28,65 +28,67 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnFrom = new System.Windows.Forms.Button();
+            this.tbFrom = new System.Windows.Forms.TextBox();
+            this.btnTo = new System.Windows.Forms.Button();
+            this.tbTo = new System.Windows.Forms.TextBox();
+            this.btnReorder = new System.Windows.Forms.Button();
             this.tbResult = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
-            // button1
+            // btnFrom
             // 
-            this.button1.Location = new System.Drawing.Point(12, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 54);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnFrom.Location = new System.Drawing.Point(12, 12);
+            this.btnFrom.Name = "btnFrom";
+            this.btnFrom.Size = new System.Drawing.Size(75, 38);
+            this.btnFrom.TabIndex = 0;
+            this.btnFrom.Text = "Honnan";
+            this.btnFrom.UseVisualStyleBackColor = true;
+            this.btnFrom.Click += new System.EventHandler(this.btnFrom_Click);
             // 
-            // textBox1
+            // tbFrom
             // 
-            this.textBox1.Location = new System.Drawing.Point(93, 30);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(344, 20);
-            this.textBox1.TabIndex = 1;
+            this.tbFrom.Location = new System.Drawing.Point(93, 22);
+            this.tbFrom.Name = "tbFrom";
+            this.tbFrom.ReadOnly = true;
+            this.tbFrom.Size = new System.Drawing.Size(425, 20);
+            this.tbFrom.TabIndex = 1;
             // 
-            // button2
+            // btnTo
             // 
-            this.button2.Location = new System.Drawing.Point(12, 72);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 54);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnTo.Location = new System.Drawing.Point(443, 48);
+            this.btnTo.Name = "btnTo";
+            this.btnTo.Size = new System.Drawing.Size(75, 38);
+            this.btnTo.TabIndex = 2;
+            this.btnTo.Text = "Hová";
+            this.btnTo.UseVisualStyleBackColor = true;
+            this.btnTo.Click += new System.EventHandler(this.btnTo_Click);
             // 
-            // textBox2
+            // tbTo
             // 
-            this.textBox2.Location = new System.Drawing.Point(93, 90);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(344, 20);
-            this.textBox2.TabIndex = 3;
+            this.tbTo.Location = new System.Drawing.Point(12, 58);
+            this.tbTo.Name = "tbTo";
+            this.tbTo.ReadOnly = true;
+            this.tbTo.Size = new System.Drawing.Size(425, 20);
+            this.tbTo.TabIndex = 3;
             // 
-            // button3
+            // btnReorder
             // 
-            this.button3.Location = new System.Drawing.Point(443, 72);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 54);
-            this.button3.TabIndex = 4;
-            this.button3.Text = "button3";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.btnReorder.Location = new System.Drawing.Point(144, 84);
+            this.btnReorder.Name = "btnReorder";
+            this.btnReorder.Size = new System.Drawing.Size(244, 29);
+            this.btnReorder.TabIndex = 4;
+            this.btnReorder.Text = "Rendez";
+            this.btnReorder.UseVisualStyleBackColor = true;
+            this.btnReorder.Click += new System.EventHandler(this.btnReorder_Click);
             // 
             // tbResult
             // 
-            this.tbResult.Location = new System.Drawing.Point(12, 132);
+            this.tbResult.Location = new System.Drawing.Point(12, 119);
             this.tbResult.Multiline = true;
             this.tbResult.Name = "tbResult";
             this.tbResult.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbResult.Size = new System.Drawing.Size(506, 291);
+            this.tbResult.Size = new System.Drawing.Size(506, 304);
             this.tbResult.TabIndex = 5;
             // 
             // Form1
@@ -95,11 +97,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(530, 435);
             this.Controls.Add(this.tbResult);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnReorder);
+            this.Controls.Add(this.tbTo);
+            this.Controls.Add(this.btnTo);
+            this.Controls.Add(this.tbFrom);
+            this.Controls.Add(this.btnFrom);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -109,11 +112,11 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnFrom;
+        private System.Windows.Forms.TextBox tbFrom;
+        private System.Windows.Forms.Button btnTo;
+        private System.Windows.Forms.TextBox tbTo;
+        private System.Windows.Forms.Button btnReorder;
         private System.Windows.Forms.TextBox tbResult;
     }
 }
