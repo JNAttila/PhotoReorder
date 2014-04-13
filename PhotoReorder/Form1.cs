@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -94,8 +95,37 @@ namespace PhotoReorder
             DoProcess();
         }
 
-        //
         private void DoProcess()
+        {
+            // könyvtár ellenőrzés
+            var di = new DirectoryInfo(_pathFrom);
+            if (di == null || di.Exists == false)
+                return;
+
+            tbResult.Text = "";
+            // végig minden fájlon
+            foreach (var item in di.EnumerateFiles("*.jp*", SearchOption.AllDirectories))
+            {
+                var created = GetCreated(item.FullName);
+                if (created.Length > 0)
+                    tbResult.Text += item.FullName + " _ " + created + Environment.NewLine;
+            }
+        }
+
+        /// <summary>
+        /// A fájl létrehozásának ideje
+        /// </summary>
+        /// <param name="filePath">a féjl elérési útja</param>
+        /// <returns>létrehozásának ideje</returns>
+        private string GetCreated(string filePath)
+        {
+            var ei = new ExifInformer(filePath);
+
+            return ei.GetCreatedString();
+        }
+
+        //
+        private void DoProcess2()
         {
             var fo = new OpenFileDialog();
             string filePath = "";
