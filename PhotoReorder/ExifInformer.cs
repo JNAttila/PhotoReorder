@@ -15,15 +15,22 @@ namespace PhotoReorder
 
     class ExifInformer
     {
-        private PropertyItem[] _properties = null;
+        // byte adatok konvertálásához
+        private ASCIIEncoding _encoder = new ASCIIEncoding();
+
+        // fotó adatok gyűjtője
+        public MyImage _myImage = new MyImage();
 
         /// <summary>
         /// Létrehozás
         /// </summary>
         /// <param name="filePath">Feldolgozandó fájl</param>
-        public ExifInformer(string filePath)
+        public ExifInformer(string filePath, string destPath)
         {
             InitExifInfo(filePath);
+
+            _myImage.PathSource = filePath;
+            _myImage.PathDest = destPath;
         }
 
         /// <summary>
@@ -32,6 +39,11 @@ namespace PhotoReorder
         /// <param name="filePath">Feldolgozandó fájl</param>
         private void InitExifInfo(string filePath)
         {
+            // beállítás üresre
+            _myImage.Machine = "_machine";
+            _myImage.CreatedDate = "_cDate";
+            _myImage.CreatedTime = "_cTime";
+
             // védelem
             if (string.IsNullOrEmpty(filePath))
                 return;
@@ -43,7 +55,7 @@ namespace PhotoReorder
             try
             {
                 var image = new Bitmap(filePath);
-                _properties = image.PropertyItems;
+                _myImage._properties = image.PropertyItems;
             }
             catch (Exception)
             {
@@ -52,30 +64,65 @@ namespace PhotoReorder
         }
 
         /// <summary>
+        /// Adatok kinyerése
+        /// </summary>
+        public void CalcDatas()
+        {
+            string _model;
+            string _tmpDateTime;
+            GetDatas(out _model, out _tmpDateTime);
+            _myImage.Machine = _model;
+
+            string _createdDate;
+            string _createTime;
+            GetDstParams(_tmpDateTime, out _createdDate, out _createTime);
+
+            _myImage.CreatedDate = _createdDate;
+            _myImage.CreatedTime = _createTime;
+
+            var di = new DirectoryInfo(_myImage.PathDest);
+            if (di != null && di.Exists)
+            {
+                // path összeállítás
+                _myImage.PathDest += "\\" + _myImage.Machine;
+            }
+        }
+
+        /// <summary>
         /// A fotó létrehozásának ideje
         /// </summary>
         /// <returns>dátum + idő</returns>
-        public string GetCreatedString()
+        private bool GetDatas(out string model, out string created)
         {
             // http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
-            // 0x9003 	DateTimeOriginal 	string 	ExifIFD 	(date/time when original image was taken)
-            var result = "";
+            // 0x0110  Model             string  IFD0 	 
+            // 0x9003  DateTimeOriginal  string  ExifIFD  (date/time when original image was taken)
+            model = "";
+            created = "";
+
+            var result = false;
 
             // végig a propertyken
-            foreach (var item in _properties)
+            foreach (var item in _myImage._properties)
             {
                 // ez a "DateTimeOriginal"
-                if (item.Id == 0x9003)
+                if (item.Id == 0x9004)
                 {
                     // kódolás
-                    var encoding = new ASCIIEncoding();
-                    var str = encoding.GetString(item.Value, 0, item.Value.Length - 1);
+                    created = _encoder.GetString(item.Value, 0, item.Value.Length - 1);
+                }
 
-                    // DEBUG
-                    //result += "ID:" + item.Id + " Len:" + item.Len +
-                    //   " Type:" + item.Type + " Value: " + str + Environment.NewLine;
+                // a fényképező típusa
+                if (item.Id == 0x0110)
+                {
+                    // kódolás
+                    model = _encoder.GetString(item.Value, 0, item.Value.Length - 1);
+                }
 
-                    result = str;
+                // mind a két adat megvan => megállás
+                if (created.Length > 0 && model.Length > 0)
+                {
+                    result = true;
                     break;
                 }
             }
@@ -84,13 +131,34 @@ namespace PhotoReorder
         }
 
         /// <summary>
-        /// Létrehozás Dátu formában
+        /// Létrehozás dátumából PATH és FILENAME paraméterek
         /// </summary>
-        /// <param name="dt">az eredmény dátum</param>
-        /// <returns>sikeres konverzió</returns>
-        public bool GetCreateDateTime(out DateTime dt)
+        /// <param name="pathParam">a PATH paraméter</param>
+        /// <param name="nameParam">a FILENAME paraméter</param>
+        /// <returns>sikeres-e a művelet</returns>
+        private bool GetDstParams(string dtStr, out string pathParam, out string nameParam)
         {
-            var result = DateTime.TryParse(GetCreatedString(), out dt);
+            var result = false;
+            pathParam = "";
+            nameParam = "";
+
+            var reateDts = dtStr.Split(' ');
+            if (reateDts.Length > 1)
+            {
+                // elérési útba a dátum
+                pathParam = reateDts[0].Replace(':', '-');
+                //pathParam = dt.Year.ToString("0000") + "-" +
+                //    dt.Month.ToString("00") + "-" + dt.Day.ToString("00");
+
+
+                // fájlnévbe az időpont
+                nameParam = reateDts[1].Replace(':', '_');
+                //nameParam = dt.Hour.ToString("00") + "_" +
+                //    dt.Minute.ToString("00") + "_" + dt.Second.ToString("00");
+
+                result = true;
+            }
+
             return result;
         }
     }

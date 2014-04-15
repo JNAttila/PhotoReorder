@@ -18,6 +18,9 @@ namespace PhotoReorder
         // képek cél könyvtára
         private string _pathTo;
 
+        // adatoka gyűjtő sora
+        List<ExifInformer> _eiList = new List<ExifInformer>();
+
         /// <summary>
         /// Létrehozás
         /// </summary>
@@ -27,6 +30,9 @@ namespace PhotoReorder
             UpdateUI();
         }
 
+        /// <summary>
+        /// Az elérési utak szerint alakul a felület
+        /// </summary>
         private void UpdateUI()
         {
             btnReorder.Enabled = false;
@@ -90,11 +96,17 @@ namespace PhotoReorder
             return result;
         }
 
+        /// <summary>
+        /// A rendezés lényegi része
+        /// </summary>
         private void btnReorder_Click(object sender, EventArgs e)
         {
             DoProcess();
         }
 
+        /// <summary>
+        /// A rendezés folyamata
+        /// </summary>
         private void DoProcess()
         {
             // könyvtár ellenőrzés
@@ -103,38 +115,27 @@ namespace PhotoReorder
                 return;
 
             tbResult.Text = "";
+            _eiList.Clear();
+
             // végig minden fájlon
             foreach (var item in di.EnumerateFiles("*.jp*", SearchOption.AllDirectories))
             {
-                var created = GetCreated(item.FullName);
-                if (created.Length > 0)
-                    tbResult.Text += item.FullName + " _ " + created + Environment.NewLine;
+                // listában tárolás
+                _eiList.Add(new ExifInformer(item.FullName, _pathTo));
             }
-        }
 
-        /// <summary>
-        /// A fájl létrehozásának ideje
-        /// </summary>
-        /// <param name="filePath">a féjl elérési útja</param>
-        /// <returns>létrehozásának ideje</returns>
-        private string GetCreated(string filePath)
-        {
-            var ei = new ExifInformer(filePath);
+            // minden Exifinformer-nek elemzés
+            foreach (var item in _eiList)
+            {
+                item.CalcDatas();
+            }
 
-            return ei.GetCreatedString();
-        }
-
-        //
-        private void DoProcess2()
-        {
-            var fo = new OpenFileDialog();
-            string filePath = "";
-            if (fo.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                filePath = fo.FileName;
-
-            var ei = new ExifInformer(filePath);
-
-            tbResult.Text = ei.GetCreatedString();
+            // az eredmények alapján
+            foreach (var item in _eiList)
+            {
+                tbResult.Text += item._myImage.PathSource + " : " + item._myImage.CreatedDate +
+                    " _ " + item._myImage.CreatedTime + " _ " + item._myImage.Machine + Environment.NewLine;
+            }
         }
     }
 }
