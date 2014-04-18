@@ -118,17 +118,21 @@
             // chbMove
             // 
             this.chbMove.AutoSize = true;
+            this.chbMove.Checked = true;
+            this.chbMove.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chbMove.Location = new System.Drawing.Point(3, 3);
             this.chbMove.Name = "chbMove";
-            this.chbMove.Size = new System.Drawing.Size(108, 17);
+            this.chbMove.Size = new System.Drawing.Size(101, 17);
             this.chbMove.TabIndex = 0;
-            this.chbMove.Text = "Fájlok mozgatása";
+            this.chbMove.Text = "Fájlok másolása";
             this.chbMove.UseVisualStyleBackColor = true;
             // 
             // chbMachine
             // 
             this.chbMachine.AutoSize = true;
-            this.chbMachine.Location = new System.Drawing.Point(117, 3);
+            this.chbMachine.Checked = true;
+            this.chbMachine.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chbMachine.Location = new System.Drawing.Point(110, 3);
             this.chbMachine.Name = "chbMachine";
             this.chbMachine.Size = new System.Drawing.Size(108, 17);
             this.chbMachine.TabIndex = 1;

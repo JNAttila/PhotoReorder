@@ -101,13 +101,18 @@ namespace PhotoReorder
         /// </summary>
         private void btnReorder_Click(object sender, EventArgs e)
         {
-            DoProcess();
+            AnalyseFiles();
+
+            if (chbMove.Checked)
+            {
+                CopyFiles();
+            }
         }
 
         /// <summary>
         /// A rendezés folyamata
         /// </summary>
-        private void DoProcess()
+        private void AnalyseFiles()
         {
             // könyvtár ellenőrzés
             var di = new DirectoryInfo(_pathFrom);
@@ -121,20 +126,46 @@ namespace PhotoReorder
             foreach (var item in di.EnumerateFiles("*.jp*", SearchOption.AllDirectories))
             {
                 // listában tárolás
-                _eiList.Add(new ExifInformer(item.FullName, _pathTo));
+                _eiList.Add(new ExifInformer(new MyImage()
+                {
+                    FullFileName = item.FullName,
+                    PathDestRoot = _pathTo
+                }
+                ));
             }
 
             // minden Exifinformer-nek elemzés
             foreach (var item in _eiList)
             {
-                item.CalcDatas();
-            }
+                item.CalcDatas(chbMachine.Checked);
 
+                tbResult.Text += item._myImage.PathDest + Environment.NewLine;
+            }
+        }
+
+        /// <summary>
+        /// Fájlok másolása paraméterek szerint
+        /// </summary>
+        private void CopyFiles()
+        {
+            DirectoryInfo di = null;
             // az eredmények alapján
             foreach (var item in _eiList)
             {
-                tbResult.Text += item._myImage.PathSource + " : " + item._myImage.CreatedDate +
-                    " _ " + item._myImage.CreatedTime + " _ " + item._myImage.Machine + Environment.NewLine;
+                // mozgatás
+                try
+                {
+                    di = new DirectoryInfo(item._myImage.PathDest);
+                    if (!di.Exists)
+                        di.Create();
+
+                    File.Copy(item._myImage.FullFileName, item._myImage.PathDest + "\\" + item._myImage.FileName);
+                }
+                catch (Exception ex)
+                {
+                    this.tbResult.Text += ">>>" + ex.GetType().ToString() + Environment.NewLine + ex.Message;
+                    this.Refresh();
+                }
             }
         }
     }

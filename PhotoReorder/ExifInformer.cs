@@ -25,12 +25,10 @@ namespace PhotoReorder
         /// Létrehozás
         /// </summary>
         /// <param name="filePath">Feldolgozandó fájl</param>
-        public ExifInformer(string filePath, string destPath)
+        public ExifInformer(MyImage myImage)
         {
-            InitExifInfo(filePath);
-
-            _myImage.PathSource = filePath;
-            _myImage.PathDest = destPath;
+            _myImage = myImage;
+            InitExifInfo(_myImage.FullFileName);
         }
 
         /// <summary>
@@ -56,6 +54,12 @@ namespace PhotoReorder
             {
                 var image = new Bitmap(filePath);
                 _myImage._properties = image.PropertyItems;
+                
+                var fileNameArr = _myImage.FullFileName.Split('\\');
+                if (fileNameArr != null && fileNameArr.Length > 1)
+                {
+                    _myImage.FileName = fileNameArr[fileNameArr.Length - 1];
+                }
             }
             catch (Exception)
             {
@@ -66,7 +70,7 @@ namespace PhotoReorder
         /// <summary>
         /// Adatok kinyerése
         /// </summary>
-        public void CalcDatas()
+        public void CalcDatas(bool sortMachine)
         {
             string _model;
             string _tmpDateTime;
@@ -80,11 +84,14 @@ namespace PhotoReorder
             _myImage.CreatedDate = _createdDate;
             _myImage.CreatedTime = _createTime;
 
-            var di = new DirectoryInfo(_myImage.PathDest);
+            var di = new DirectoryInfo(_myImage.PathDestRoot);
             if (di != null && di.Exists)
             {
                 // path összeállítás
-                _myImage.PathDest += "\\" + _myImage.Machine;
+                _myImage.PathDest = new StringBuilder(_myImage.PathDestRoot)
+                    .Append(((sortMachine) ? ("\\" + _myImage.Machine) : ("")))
+                    .Append("\\").Append(_myImage.CreatedDate)
+                    .ToString();
             }
         }
 

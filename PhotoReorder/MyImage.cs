@@ -15,10 +15,12 @@ namespace PhotoReorder
         public string PathDestRoot { get; set; }
 
         // fotó adatok
+        public string FullFileName { get; set; }
         public string FileName { get; set; }
         public string Machine { get; set; }
         public string CreatedDate { get; set; }
         public string CreatedTime { get; set; }
+        public int Size { get; set; }
 
         // EXIF infóTömb
         public PropertyItem[] _properties = null;
