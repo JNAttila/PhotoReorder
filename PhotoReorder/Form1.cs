@@ -148,18 +148,46 @@ namespace PhotoReorder
         /// </summary>
         private void CopyFiles()
         {
+            // könyvtár ellenőrzése
             DirectoryInfo di = null;
+            // fájl ellenőrzése
+            FileInfo fi = null;
+
+            // fájl számozás
+            int fileCnt = 0;
+            // teljes fájl név
+            string fullNewFileName;
+
             // az eredmények alapján
             foreach (var item in _eiList)
             {
                 // mozgatás
                 try
                 {
+                    // célkönyvtár ellenőrzése, ha kell létrehozása
                     di = new DirectoryInfo(item._myImage.PathDest);
                     if (!di.Exists)
                         di.Create();
 
-                    File.Copy(item._myImage.FullFileName, item._myImage.PathDest + "\\" + item._myImage.FileName);
+                    // új fájl teljes eléréi útja
+                    fullNewFileName = item._myImage.PathDest + "\\" + item._myImage.FileName;
+
+                    // egyedi fájlnév keresése
+                    fi = new FileInfo(fullNewFileName);
+                    if (fi.Exists)
+                    {
+                        while (fi.Exists)
+                        {
+                            fullNewFileName = item._myImage.PathDest + "\\"
+                                + item._myImage.FileName + "_" + (++fileCnt).ToString("00");
+
+                            fi = new FileInfo(fullNewFileName);
+                        }
+                    }
+
+                    File.Copy(item._myImage.FullFileName, fullNewFileName);
+
+                    fileCnt = 0;
                 }
                 catch (Exception ex)
                 {
