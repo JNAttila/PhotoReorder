@@ -52,9 +52,10 @@ namespace PhotoReorder
             // adatok kinyerése
             try
             {
+                _myImage.Size = fi.Length;
                 var image = new Bitmap(filePath);
                 _myImage._properties = image.PropertyItems;
-                
+
                 var fileNameArr = _myImage.FullFileName.Split('\\');
                 if (fileNameArr != null && fileNameArr.Length > 1)
                 {
@@ -84,14 +85,17 @@ namespace PhotoReorder
             _myImage.CreatedDate = _createdDate;
             _myImage.CreatedTime = _createTime;
 
-            var di = new DirectoryInfo(_myImage.PathDestRoot);
-            if (di != null && di.Exists)
+            if (!string.IsNullOrEmpty(_myImage.PathDestRoot))
             {
-                // path összeállítás
-                _myImage.PathDest = new StringBuilder(_myImage.PathDestRoot)
-                    .Append(((sortMachine) ? ("\\" + _myImage.Machine) : ("")))
-                    .Append("\\").Append(_myImage.CreatedDate)
-                    .ToString();
+                var di = new DirectoryInfo(_myImage.PathDestRoot);
+                if (di != null && di.Exists)
+                {
+                    // path összeállítás
+                    _myImage.PathDest = new StringBuilder(_myImage.PathDestRoot)
+                        .Append(((sortMachine) ? ("\\" + _myImage.Machine) : ("")))
+                        .Append("\\").Append(_myImage.CreatedDate)
+                        .ToString();
+                }
             }
         }
 

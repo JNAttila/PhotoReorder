@@ -20,7 +20,7 @@ namespace PhotoReorder
         public string Machine { get; set; }
         public string CreatedDate { get; set; }
         public string CreatedTime { get; set; }
-        public int Size { get; set; }
+        public long Size { get; set; }
 
         // EXIF infóTömb
         public PropertyItem[] _properties = null;

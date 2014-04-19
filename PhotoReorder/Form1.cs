@@ -21,6 +21,16 @@ namespace PhotoReorder
         // adatoka gyűjtő sora
         List<ExifInformer> _eiList = new List<ExifInformer>();
 
+        // másolt fájlok
+        int fileCopied;
+        // kihagyott fájlok
+        int fileCancelled;
+
+        /// <summary>
+        /// Fotó album
+        /// </summary>
+        public Dictionary<string, List<string>> dict = null;
+
         /// <summary>
         /// Létrehozás
         /// </summary>
@@ -43,6 +53,21 @@ namespace PhotoReorder
                 return;
 
             btnReorder.Enabled = true;
+        }
+
+        /// <summary>
+        /// Fotó album alapbaállítás
+        /// </summary>
+        private void InitFotoDict()
+        {
+            if (dict == null)
+                dict = new Dictionary<string, List<string>>();
+
+            foreach (var i in dict)
+            {
+                i.Value.Clear();
+            }
+            dict.Clear();
         }
 
         /// <summary>
@@ -103,9 +128,21 @@ namespace PhotoReorder
         {
             AnalyseFiles();
 
+            DiscoverDestFolder();
+
             if (chbMove.Checked)
             {
+                fileCopied = 0;
+                fileCancelled = 0;
+
                 CopyFiles();
+
+                var result = "Fájlok másolva: " + fileCopied + Environment.NewLine +
+                    "Fájlok kihagyva: " + fileCancelled;
+
+                tbResult.Text += result;
+                MessageBox.Show(result, "Rendezés eredménye",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -138,9 +175,72 @@ namespace PhotoReorder
             foreach (var item in _eiList)
             {
                 item.CalcDatas(chbMachine.Checked);
-
-                tbResult.Text += item._myImage.PathDest + Environment.NewLine;
             }
+        }
+
+        /// <summary>
+        /// Célkönyvtár felderítése, már ottlévő fájlok után kutatva
+        /// </summary>
+        private void DiscoverDestFolder()
+        {
+            // könyvtár ellenőrzés
+            var di = new DirectoryInfo(_pathTo);
+            if (di == null || di.Exists == false)
+                return;
+
+            InitFotoDict();
+
+            // végig minden fájlon
+            foreach (var item in di.EnumerateFiles("*.jp*", SearchOption.AllDirectories))
+            {
+                var ei = new ExifInformer(new MyImage()
+                {
+                    FullFileName = item.FullName
+                }
+                );
+                ei.CalcDatas(chbMachine.Checked);
+
+                // bejegyzés a fotóalbum megfelelő listájába
+                var dictVal = ei._myImage.CreatedTime + "_" + item.Length;
+
+                // fotóalbum elérési út
+                var dictKey = _pathTo + ((chbMachine.Checked) ? ("\\" + ei._myImage.Machine) : ("")) +
+                    "\\" + ei._myImage.CreatedDate;
+                if (!dict.ContainsKey(dictKey))
+                {
+                    dict.Add(dictKey, new List<string>());
+                }
+                if (!dict[dictKey].Contains(dictVal))
+                    dict[dictKey].Add(dictVal);
+            }
+        }
+
+        /// <summary>
+        /// A szám szerint megváltoztatja a fájl nevét
+        /// </summary>
+        /// <param name="fileName">fájl eredeti neve</param>
+        /// <param name="number">sorszám</param>
+        /// <returns>módosított fájlnév</returns>
+        private string FileNamePlusCounter(string fileName, int number)
+        {
+            // eredmény
+            string result = "";
+
+            // fájlnév darabok
+            var fName = fileName.Split('.');
+            if (fName == null)
+                // nem OK, szóval egyszerűsítés
+                return fileName + number;
+
+            // a fájlnév elemei mentén
+            for (int i = 0; i < fName.Length - 1; ++i)
+            {
+                result += fName[i] + ".";
+            }
+            // szám fájlnévbe építése + kiterjesztés
+            result += number.ToString("000") + "." + fName[fName.Length - 1];
+
+            return result;
         }
 
         /// <summary>
@@ -164,6 +264,32 @@ namespace PhotoReorder
                 // mozgatás
                 try
                 {
+                    // bejegyzés a fotóalbum megfelelő listájába
+                    var dictVal = item._myImage.CreatedTime + "_" + item._myImage.Size;
+
+                    // fotóalbum elérési út
+                    var dictKey = _pathTo + ((chbMachine.Checked) ? ("\\" + item._myImage.Machine) : ("")) +
+                        "\\" + item._myImage.CreatedDate;
+                    if (!dict.ContainsKey(dictKey))
+                    {
+                        dict.Add(dictKey, new List<string>());
+                    }
+                    if (dict[dictKey].Contains(dictVal))
+                    {
+                        // egyel több kihagyott fájl 
+                        ++fileCancelled;
+                        // melyik volt az a fájl
+                        tbResult.Text += "Kihagyva: " + item._myImage.PathSource + "\\" +
+                        item._myImage.FileName + Environment.NewLine;
+
+                        this.Refresh();
+
+                        // már van ilyen fájl mehetünk tovább
+                        continue;
+                    }
+
+                    dict[dictKey].Add(dictVal);
+
                     // célkönyvtár ellenőrzése, ha kell létrehozása
                     di = new DirectoryInfo(item._myImage.PathDest);
                     if (!di.Exists)
@@ -179,7 +305,7 @@ namespace PhotoReorder
                         while (fi.Exists)
                         {
                             fullNewFileName = item._myImage.PathDest + "\\"
-                                + item._myImage.FileName + "_" + (++fileCnt).ToString("00");
+                                + FileNamePlusCounter(item._myImage.FileName, ++fileCnt);
 
                             fi = new FileInfo(fullNewFileName);
                         }
@@ -188,6 +314,9 @@ namespace PhotoReorder
                     File.Copy(item._myImage.FullFileName, fullNewFileName);
 
                     fileCnt = 0;
+
+                    // egyel több másolt fájl
+                    ++fileCopied;
                 }
                 catch (Exception ex)
                 {
