@@ -21,6 +21,10 @@ namespace PhotoReorder
         // fotó adatok gyűjtője
         public MyImage _myImage = new MyImage();
 
+        // nyers adatok az exif-ből
+        private string _rawModel = "";
+        private string _rawDate = "";
+
         /// <summary>
         /// Létrehozás
         /// </summary>
@@ -49,12 +53,25 @@ namespace PhotoReorder
             if (!fi.Exists)
                 return;
 
+            Bitmap image = null;
+
             // adatok kinyerése
             try
             {
                 _myImage.Size = fi.Length;
-                var image = new Bitmap(filePath);
-                _myImage._properties = image.PropertyItems;
+                image = new Bitmap(filePath);
+
+                // http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
+                // 0x0110  Model             string  IFD0 	 
+                // 0x9003  DateTimeOriginal  string  ExifIFD  (date/time when original image was taken)
+
+                // létrehozás dátuma
+                var pItemDate = image.GetPropertyItem(0x9004);
+                _rawDate = _encoder.GetString(pItemDate.Value, 0, pItemDate.Value.Length - 1);
+
+                // eszköz neve
+                var pItemModel = image.GetPropertyItem(0x0110);
+                _rawModel = _encoder.GetString(pItemModel.Value, 0, pItemModel.Value.Length - 1);
 
                 var fileNameArr = _myImage.FullFileName.Split('\\');
                 if (fileNameArr != null && fileNameArr.Length > 1)
@@ -66,6 +83,11 @@ namespace PhotoReorder
             {
                 return;
             }
+            finally
+            {
+                // memória gazdálkodás
+                image.Dispose();
+            }
         }
 
         /// <summary>
@@ -73,14 +95,11 @@ namespace PhotoReorder
         /// </summary>
         public void CalcDatas(bool sortMachine)
         {
-            string _model;
-            string _tmpDateTime;
-            GetDatas(out _model, out _tmpDateTime);
-            _myImage.Machine = _model;
+            _myImage.Machine = _rawModel;
 
             string _createdDate;
             string _createTime;
-            GetDstParams(_tmpDateTime, out _createdDate, out _createTime);
+            GetDstParams(_rawDate, out _createdDate, out _createTime);
 
             _myImage.CreatedDate = _createdDate;
             _myImage.CreatedTime = _createTime;
@@ -97,48 +116,6 @@ namespace PhotoReorder
                         .ToString();
                 }
             }
-        }
-
-        /// <summary>
-        /// A fotó létrehozásának ideje
-        /// </summary>
-        /// <returns>dátum + idő</returns>
-        private bool GetDatas(out string model, out string created)
-        {
-            // http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
-            // 0x0110  Model             string  IFD0 	 
-            // 0x9003  DateTimeOriginal  string  ExifIFD  (date/time when original image was taken)
-            model = "";
-            created = "";
-
-            var result = false;
-
-            // végig a propertyken
-            foreach (var item in _myImage._properties)
-            {
-                // ez a "DateTimeOriginal"
-                if (item.Id == 0x9004)
-                {
-                    // kódolás
-                    created = _encoder.GetString(item.Value, 0, item.Value.Length - 1);
-                }
-
-                // a fényképező típusa
-                if (item.Id == 0x0110)
-                {
-                    // kódolás
-                    model = _encoder.GetString(item.Value, 0, item.Value.Length - 1);
-                }
-
-                // mind a két adat megvan => megállás
-                if (created.Length > 0 && model.Length > 0)
-                {
-                    result = true;
-                    break;
-                }
-            }
-
-            return result;
         }
 
         /// <summary>

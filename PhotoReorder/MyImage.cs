@@ -21,8 +21,5 @@ namespace PhotoReorder
         public string CreatedDate { get; set; }
         public string CreatedTime { get; set; }
         public long Size { get; set; }
-
-        // EXIF infóTömb
-        public PropertyItem[] _properties = null;
     }
 }
