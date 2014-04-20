@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace PhotoReorder
 {
-    public partial class Form1 : Form
+    public partial class PhotoReorder : Form
     {
         // képek forrása
         private string _pathFrom;
@@ -34,7 +34,7 @@ namespace PhotoReorder
         /// <summary>
         /// Létrehozás
         /// </summary>
-        public Form1()
+        public PhotoReorder()
         {
             InitializeComponent();
             UpdateUI();

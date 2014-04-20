@@ -1,6 +1,6 @@
 ﻿namespace PhotoReorder
 {
-    partial class Form1
+    partial class PhotoReorder
     {
         /// <summary>
         /// Required designer variable.
@@ -57,13 +57,13 @@
             this.tbFrom.Location = new System.Drawing.Point(93, 22);
             this.tbFrom.Name = "tbFrom";
             this.tbFrom.ReadOnly = true;
-            this.tbFrom.Size = new System.Drawing.Size(612, 20);
+            this.tbFrom.Size = new System.Drawing.Size(446, 20);
             this.tbFrom.TabIndex = 1;
             // 
             // btnTo
             // 
             this.btnTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTo.Location = new System.Drawing.Point(630, 48);
+            this.btnTo.Location = new System.Drawing.Point(464, 48);
             this.btnTo.Name = "btnTo";
             this.btnTo.Size = new System.Drawing.Size(75, 38);
             this.btnTo.TabIndex = 2;
@@ -78,13 +78,13 @@
             this.tbTo.Location = new System.Drawing.Point(12, 58);
             this.tbTo.Name = "tbTo";
             this.tbTo.ReadOnly = true;
-            this.tbTo.Size = new System.Drawing.Size(612, 20);
+            this.tbTo.Size = new System.Drawing.Size(446, 20);
             this.tbTo.TabIndex = 3;
             // 
             // btnReorder
             // 
             this.btnReorder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReorder.Location = new System.Drawing.Point(488, 84);
+            this.btnReorder.Location = new System.Drawing.Point(322, 84);
             this.btnReorder.Name = "btnReorder";
             this.btnReorder.Size = new System.Drawing.Size(136, 29);
             this.btnReorder.TabIndex = 4;
@@ -101,7 +101,7 @@
             this.tbResult.Multiline = true;
             this.tbResult.Name = "tbResult";
             this.tbResult.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbResult.Size = new System.Drawing.Size(693, 203);
+            this.tbResult.Size = new System.Drawing.Size(527, 203);
             this.tbResult.TabIndex = 5;
             // 
             // flowLayoutPanel1
@@ -112,7 +112,7 @@
             this.flowLayoutPanel1.Controls.Add(this.chbMachine);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 84);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(470, 29);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(304, 29);
             this.flowLayoutPanel1.TabIndex = 6;
             // 
             // chbMove
@@ -139,11 +139,11 @@
             this.chbMachine.Text = "Gépenként külön";
             this.chbMachine.UseVisualStyleBackColor = true;
             // 
-            // Form1
+            // PhotoReorder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(717, 334);
+            this.ClientSize = new System.Drawing.Size(551, 334);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.tbResult);
             this.Controls.Add(this.btnReorder);
@@ -152,9 +152,9 @@
             this.Controls.Add(this.tbFrom);
             this.Controls.Add(this.btnFrom);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "Form1";
+            this.Name = "PhotoReorder";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form1";
+            this.Text = "Fotó rendező";
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
