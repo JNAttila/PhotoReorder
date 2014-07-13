@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PhotoReorder
 {
-    class MyImage
+    public class MyImage
     {
         // könyvtár adatok
         public string PathSource { get; set; }

@@ -13,7 +13,7 @@ namespace PhotoReorder
     // http://msdn.microsoft.com/en-us/library/xddt0dz7.aspx
     // http://stackoverflow.com/questions/58649/how-to-get-the-exif-data-from-a-file-using-c-sharp
 
-    class ExifInformer
+    public class ExifInformer
     {
         // byte adatok konvertálásához
         private ASCIIEncoding _encoder = new ASCIIEncoding();
@@ -78,6 +78,7 @@ namespace PhotoReorder
                 {
                     _myImage.FileName = fileNameArr[fileNameArr.Length - 1];
                 }
+                _myImage.PathSource = filePath;
             }
             catch (Exception)
             {
@@ -86,7 +87,8 @@ namespace PhotoReorder
             finally
             {
                 // memória gazdálkodás
-                image.Dispose();
+                if (image != null)
+                    image.Dispose();
             }
         }
 

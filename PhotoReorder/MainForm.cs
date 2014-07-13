@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,7 +20,7 @@ namespace PhotoReorder
         private string _pathTo;
 
         // adatoka gyűjtő sora
-        List<ExifInformer> _eiList = new List<ExifInformer>();
+        public List<ExifInformer> _eiList = new List<ExifInformer>();
 
         // másolt fájlok
         int fileCopied;
@@ -32,12 +33,37 @@ namespace PhotoReorder
         public Dictionary<string, List<string>> dict = null;
 
         /// <summary>
+        /// Naplózást végző objektum
+        /// </summary>
+        private ThreadLogger _logger;
+
+        /// <summary>
+        /// Képelemzés szála
+        /// </summary>
+        private Thread analyseThread = null;
+
+        /// <summary>
         /// Létrehozás
         /// </summary>
         public PhotoReorder()
         {
             InitializeComponent();
             UpdateUI();
+
+            _logger = new ThreadLogger(ref tbResult);
+        }
+
+        /// <summary>
+        /// A folyamatot elinidító gomb felületénem módosítása
+        /// </summary>
+        /// <param name="isRunning">a beállítandó állapot</param>
+        public void UpdateStartBtn(bool isRunning)
+        {
+            btnReorder.BeginInvoke(new Action(() =>
+            {
+                //btnReorder.Enabled = !isRunning;
+                btnReorder.Text = (isRunning) ? ("Rendezés STOP") : ("Rendez");
+            }));
         }
 
         /// <summary>
@@ -54,6 +80,36 @@ namespace PhotoReorder
 
             btnReorder.Enabled = true;
         }
+
+        /// <summary>
+        /// Pontos idő
+        /// </summary>
+        /// <returns>formázott</returns>
+        string Now()
+        {
+            return DateTime.Now.ToLongTimeString() + " - ";
+        }
+
+        ///// <summary>
+        ///// Naplózás
+        ///// </summary>
+        ///// <param name="msg">üzenet</param>
+        ///// <param name="printNewLine">kell-e új sor</param>
+        ///// <param name="printDate">kell-e dátum</param>
+        //void Log(string msg, bool printNewLine = true, bool printDate = true)
+        //{
+        //    tbResult.BeginInvoke(new Action(() =>
+        //    {
+        //        // bejegyzés dekorálása dátummal és befejés sortöréssel, igény szerint
+        //        var newMsg = ((printDate) ? (Now()) : ("")) + msg + ((printNewLine) ? (Environment.NewLine) : (""));
+
+        //        // a kijelzés után az utolsó üzenet látszódjon
+        //        tbResult.Text += newMsg;
+        //        Update();
+        //        tbResult.Select(tbResult.Text.Length, 0);
+        //        tbResult.ScrollToCaret();
+        //    }));
+        //}
 
         /// <summary>
         /// Fotó album alapbaállítás
@@ -112,6 +168,7 @@ namespace PhotoReorder
 
             // Dialógus nyitása és kezelése
             var od = new FolderBrowserDialog();
+            od.RootFolder = Environment.SpecialFolder.Desktop;
             if (od.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 path = od.SelectedPath;
@@ -126,24 +183,43 @@ namespace PhotoReorder
         /// </summary>
         private void btnReorder_Click(object sender, EventArgs e)
         {
-            AnalyseFiles();
-
-            DiscoverDestFolder();
-
-            if (chbMove.Checked)
+            if (analyseThread == null || !analyseThread.IsAlive)
             {
-                fileCopied = 0;
-                fileCancelled = 0;
+                _logger.Log("Forrásképek elemzése");
 
-                CopyFiles();
+                // indító form módosítása
+                UpdateStartBtn(true);
 
-                var result = "Fájlok másolva: " + fileCopied + Environment.NewLine +
-                    "Fájlok kihagyva: " + fileCancelled;
-
-                tbResult.Text += result;
-                MessageBox.Show(result, "Rendezés eredménye",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                AnalyseFiles();
             }
+            else
+            {
+                _logger.Log("Elemzés megszakítva!");
+
+                // indító form módosítása
+                UpdateStartBtn(false);
+
+                analyseThread.Abort();
+            }
+
+            //AnalyseFiles();
+
+            //DiscoverDestFolder();
+
+            //if (chbMove.Checked)
+            //{
+            //    fileCopied = 0;
+            //    fileCancelled = 0;
+
+            //    CopyFiles();
+
+            //    var result = "Fájlok másolva: " + fileCopied + Environment.NewLine +
+            //        "Fájlok kihagyva: " + fileCancelled;
+
+            //    tbResult.Text += result;
+            //    MessageBox.Show(result, "Rendezés eredménye",
+            //        MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //}
         }
 
         /// <summary>
@@ -151,31 +227,12 @@ namespace PhotoReorder
         /// </summary>
         private void AnalyseFiles()
         {
-            // könyvtár ellenőrzés
-            var di = new DirectoryInfo(_pathFrom);
-            if (di == null || di.Exists == false)
-                return;
+            //new Thread(new MapUsingThread(map, "mfmt_", randSeed).Find
+            analyseThread = new Thread(new ThreadAnalyseFiles(_pathFrom, _pathTo,
+                chbMachine.Checked, ref _eiList, ThreadFileType.IMAGE_JPG, ref tbResult,
+                this).AnalyleFiles);
 
-            tbResult.Text = "";
-            _eiList.Clear();
-
-            // végig minden fájlon
-            foreach (var item in di.EnumerateFiles("*.jp*", SearchOption.AllDirectories))
-            {
-                // listában tárolás
-                _eiList.Add(new ExifInformer(new MyImage()
-                {
-                    FullFileName = item.FullName,
-                    PathDestRoot = _pathTo
-                }
-                ));
-            }
-
-            // minden Exifinformer-nek elemzés
-            foreach (var item in _eiList)
-            {
-                item.CalcDatas(chbMachine.Checked);
-            }
+            analyseThread.Start();
         }
 
         /// <summary>
@@ -279,8 +336,7 @@ namespace PhotoReorder
                         // egyel több kihagyott fájl 
                         ++fileCancelled;
                         // melyik volt az a fájl
-                        tbResult.Text += "Kihagyva: " + item._myImage.PathSource + "\\" +
-                        item._myImage.FileName + Environment.NewLine;
+                        _logger.Log("Kihagyva: " + item._myImage.PathSource);
 
                         this.Refresh();
 
