@@ -34,15 +34,22 @@ namespace PhotoReorder
         /// </summary>
         TextBox _tbLog;
 
+        /// <summary>
+        /// Folyamatjelző
+        /// </summary>
+        ProgressBar _pgBar;
+
         #endregion adattagok
 
         /// <summary>
         /// Létrehozás
         /// </summary>
         /// <param name="tbLog">Naplózás számára ablak</param>
-        public ThreadLogger(ref TextBox tbLog)
+        /// <param name="pgBar">Folyamat jelző</param>
+        public ThreadLogger(ref TextBox tbLog, ref ProgressBar pgBar)
         {
             _tbLog = tbLog;
+            _pgBar = pgBar;
         }
 
         /// <summary>
@@ -71,131 +78,43 @@ namespace PhotoReorder
                 _tbLog.AppendText(newMsg);
             }));
         }
-    }
 
-    public class ThreadAnalyseFiles
-    {
-        #region tagváltozók
+        #region folyamatjelző
 
         /// <summary>
-        /// az adatok begyűjtésének kezdeti könyvtára
+        /// Folyamatjelző alap állapotba
         /// </summary>
-        string _pathFrom;
-
-        /// <summary>
-        /// Képek másolásásnak gyökér könyvtára
-        /// </summary>
-        string _pathTo;
-
-        /// <summary>
-        /// Kell-e gépenként külön könyvtár
-        /// </summary>
-        bool _byMachines;
-
-        /// <summary>
-        /// képi infpormációk gyűjtő helye
-        /// </summary>
-        List<ExifInformer> _exifInfoList;
-
-        /// <summary>
-        /// Fájlok keresési mintája
-        /// </summary>
-        string _searchPattern;
-
-        /// <summary>
-        /// Naplózást végző osztály
-        /// </summary>
-        ThreadLogger _logger;
-
-        PhotoReorder _super;
-
-        #endregion tagváltozók
-
-        /// <summary>
-        /// Létrehozás
-        /// </summary>
-        /// <param name="pathFrom">fájlok keresésének kiindulási helye</param>
-        /// <param name="pathTo">fájlok másolásának cél gyökér könyvtára</param>
-        /// <param name="byMachines">kell-e gépenként külön könyvtár</param>
-        /// <param name="exifIL">képii információ listája</param>
-        /// <param name="pattern">képkeresési minta</param>
-        /// <param name="tbLog">log üzenetek ablaka</param>
-        public ThreadAnalyseFiles(string pathFrom, string pathTo, bool byMachines,
-            ref List<ExifInformer> exifIL, string pattern, ref TextBox tbLog, PhotoReorder super)
+        public void PgbReset()
         {
-            _pathFrom = pathFrom;
-            _pathTo = pathTo;
-            _byMachines = byMachines;
-            _exifInfoList = exifIL;
-            _searchPattern = pattern;
-            _logger = new ThreadLogger(ref tbLog);
-            _super = super;
+            _pgBar.BeginInvoke(new Action(() =>
+            {
+                _pgBar.Value = 0;
+            }));
         }
 
         /// <summary>
-        /// Fájlok elemzése
+        /// A maximális érték beállítása
         /// </summary>
-        public void AnalyleFiles()
+        /// <param name="maxValue">Max érték</param>
+        public void PgbInit(int maxValue)
         {
-            // könyvtár ellenőrzés
-            var di = new DirectoryInfo(_pathFrom);
-            if (di == null || di.Exists == false)
-                return;
-
-            _exifInfoList.Clear();
-
-            // könyvtárak számlálója
-            int fileCnt = 0;
-            // utolsó elemzett könyvtár neve
-            string lastDir = "";
-            int lastFileCnt = 0;
-
-            // végig minden fájlon
-            foreach (var item in di.EnumerateFiles(_searchPattern, SearchOption.AllDirectories))
+            _pgBar.BeginInvoke(new Action(() =>
             {
-                if (lastDir != item.DirectoryName)
-                {
-                    if (fileCnt != lastFileCnt)
-                    {
-                        _logger.Log("Képek : " + (fileCnt - lastFileCnt).ToString() + "db");
-                        lastFileCnt = fileCnt;
-                    }
-
-                    lastDir = item.DirectoryName;
-                    _logger.Log("Könyvtár: " + lastDir);
-                }
-
-                // listában tárolás
-                _exifInfoList.Add(new ExifInformer(new MyImage()
-                {
-                    FullFileName = item.FullName,
-                    PathDestRoot = _pathTo
-                }
-                ));
-
-                ++fileCnt;
-            }
-
-            _logger.Log("Képek : " + (fileCnt - lastFileCnt).ToString() + "db");
-
-            _logger.Log("Összes talált fájlok száma: " + fileCnt.ToString());
-
-            // minden Exifinformer-nek elemzés
-            foreach (var item in _exifInfoList)
-            {
-                item.CalcDatas(_byMachines);
-            }
-
-            // indító form módosítása
-            _super.UpdateStartBtn(false);
+                _pgBar.Maximum = maxValue;
+            }));
         }
-    }
 
-    public class ThreadDiscoverDestFolder
-    {
-    }
+        /// <summary>
+        /// Az állapotjelző léptetése
+        /// </summary>
+        public void PgbStep()
+        {
+            _pgBar.BeginInvoke(new Action(() =>
+            {
+                _pgBar.PerformStep();
+            }));
+        }
 
-    public class ThreadCopyFiles
-    {
+        #endregion folyamatjelző
     }
 }

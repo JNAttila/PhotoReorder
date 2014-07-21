@@ -37,6 +37,8 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.chbMove = new System.Windows.Forms.CheckBox();
             this.chbMachine = new System.Windows.Forms.CheckBox();
+            this.pgBarMain = new System.Windows.Forms.ProgressBar();
+            this.chbDebug = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,13 +59,13 @@
             this.tbFrom.Location = new System.Drawing.Point(93, 22);
             this.tbFrom.Name = "tbFrom";
             this.tbFrom.ReadOnly = true;
-            this.tbFrom.Size = new System.Drawing.Size(732, 20);
+            this.tbFrom.Size = new System.Drawing.Size(792, 20);
             this.tbFrom.TabIndex = 1;
             // 
             // btnTo
             // 
             this.btnTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTo.Location = new System.Drawing.Point(750, 48);
+            this.btnTo.Location = new System.Drawing.Point(810, 48);
             this.btnTo.Name = "btnTo";
             this.btnTo.Size = new System.Drawing.Size(75, 38);
             this.btnTo.TabIndex = 2;
@@ -78,13 +80,13 @@
             this.tbTo.Location = new System.Drawing.Point(12, 58);
             this.tbTo.Name = "tbTo";
             this.tbTo.ReadOnly = true;
-            this.tbTo.Size = new System.Drawing.Size(732, 20);
+            this.tbTo.Size = new System.Drawing.Size(792, 20);
             this.tbTo.TabIndex = 3;
             // 
             // btnReorder
             // 
             this.btnReorder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReorder.Location = new System.Drawing.Point(608, 84);
+            this.btnReorder.Location = new System.Drawing.Point(668, 84);
             this.btnReorder.Name = "btnReorder";
             this.btnReorder.Size = new System.Drawing.Size(136, 29);
             this.btnReorder.TabIndex = 4;
@@ -101,18 +103,17 @@
             this.tbResult.Multiline = true;
             this.tbResult.Name = "tbResult";
             this.tbResult.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbResult.Size = new System.Drawing.Size(813, 220);
+            this.tbResult.Size = new System.Drawing.Size(873, 365);
             this.tbResult.TabIndex = 5;
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.flowLayoutPanel1.Controls.Add(this.chbMove);
             this.flowLayoutPanel1.Controls.Add(this.chbMachine);
+            this.flowLayoutPanel1.Controls.Add(this.chbDebug);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 84);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(590, 29);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(301, 29);
             this.flowLayoutPanel1.TabIndex = 6;
             // 
             // chbMove
@@ -139,11 +140,33 @@
             this.chbMachine.Text = "Gépenként külön";
             this.chbMachine.UseVisualStyleBackColor = true;
             // 
+            // pgBarMain
+            // 
+            this.pgBarMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgBarMain.Location = new System.Drawing.Point(319, 87);
+            this.pgBarMain.Name = "pgBarMain";
+            this.pgBarMain.Size = new System.Drawing.Size(343, 20);
+            this.pgBarMain.TabIndex = 2;
+            // 
+            // chbDebug
+            // 
+            this.chbDebug.AutoSize = true;
+            this.chbDebug.Checked = true;
+            this.chbDebug.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chbDebug.Location = new System.Drawing.Point(224, 3);
+            this.chbDebug.Name = "chbDebug";
+            this.chbDebug.Size = new System.Drawing.Size(73, 17);
+            this.chbDebug.TabIndex = 2;
+            this.chbDebug.Text = "Részletek";
+            this.chbDebug.UseVisualStyleBackColor = true;
+            // 
             // PhotoReorder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(837, 351);
+            this.ClientSize = new System.Drawing.Size(897, 496);
+            this.Controls.Add(this.pgBarMain);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.tbResult);
             this.Controls.Add(this.btnReorder);
@@ -173,6 +196,8 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.CheckBox chbMove;
         private System.Windows.Forms.CheckBox chbMachine;
+        private System.Windows.Forms.ProgressBar pgBarMain;
+        private System.Windows.Forms.CheckBox chbDebug;
     }
 }
 
