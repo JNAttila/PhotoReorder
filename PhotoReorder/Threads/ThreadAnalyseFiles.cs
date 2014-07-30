@@ -139,7 +139,7 @@ namespace PhotoReorder.Threads
                 _exifInfoList.Add(new ExifInformer(new MyImage()
                 {
                     FullFileName = item.FullName,
-                    PathDestRoot = _pathFrom
+                    PathDestRoot = _pathFrom + '\\' + _destPrefix
                 }
                 ));
 
@@ -303,7 +303,17 @@ namespace PhotoReorder.Threads
                     // célkönyvtár ellenőrzése, ha kell létrehozása
                     di = new DirectoryInfo(item._myImage.PathDest);
                     if (!di.Exists)
+                    {
                         di.Create();
+                        di.Refresh();
+                    }
+                    // sikertelen létrehozás
+                    if (!di.Exists)
+                    {
+                        if (_debug)
+                            _logger.Log("Célkönyvtár nem hozható létre: " + item._myImage.PathDest);
+                        continue;
+                    }
 
                     // új fájl teljes eléréi útja
                     fullNewFileName = item._myImage.PathDest + "\\" + item._myImage.FileName;
@@ -321,8 +331,8 @@ namespace PhotoReorder.Threads
                         }
                     }
 
-#warning A másolás helyett mozgatás kell
-                    File.Copy(item._myImage.FullFileName, fullNewFileName);
+                    // kép mozgatása cél helyre
+                    File.Move(item._myImage.FullFileName, fullNewFileName);
 
                     fileCnt = 0;
 

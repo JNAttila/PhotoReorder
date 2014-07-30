@@ -133,7 +133,16 @@ namespace PhotoReorder
             // képfájl cél könyvtárának összeállítása
             if (!string.IsNullOrEmpty(_myImage.PathDestRoot))
             {
+                // célkönyvtár
                 var di = new DirectoryInfo(_myImage.PathDestRoot);
+                // létrehozás, ha még nincs
+                if (di != null && !di.Exists)
+                {
+                    di.Create();
+                    di.Refresh();
+                }
+
+                // létezik már a cél könyvtár
                 if (di != null && di.Exists)
                 {
                     // path összeállítás

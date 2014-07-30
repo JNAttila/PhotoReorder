@@ -30,15 +30,13 @@
         {
             this.btnFrom = new System.Windows.Forms.Button();
             this.tbFrom = new System.Windows.Forms.TextBox();
-            this.btnTo = new System.Windows.Forms.Button();
-            this.tbTo = new System.Windows.Forms.TextBox();
             this.btnReorder = new System.Windows.Forms.Button();
             this.tbResult = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.chbMove = new System.Windows.Forms.CheckBox();
             this.chbMachine = new System.Windows.Forms.CheckBox();
-            this.pgBarMain = new System.Windows.Forms.ProgressBar();
             this.chbDebug = new System.Windows.Forms.CheckBox();
+            this.pgBarMain = new System.Windows.Forms.ProgressBar();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,31 +60,10 @@
             this.tbFrom.Size = new System.Drawing.Size(792, 20);
             this.tbFrom.TabIndex = 1;
             // 
-            // btnTo
-            // 
-            this.btnTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTo.Location = new System.Drawing.Point(810, 48);
-            this.btnTo.Name = "btnTo";
-            this.btnTo.Size = new System.Drawing.Size(75, 38);
-            this.btnTo.TabIndex = 2;
-            this.btnTo.Text = "Hová";
-            this.btnTo.UseVisualStyleBackColor = true;
-            this.btnTo.Click += new System.EventHandler(this.btnTo_Click);
-            // 
-            // tbTo
-            // 
-            this.tbTo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbTo.Location = new System.Drawing.Point(12, 58);
-            this.tbTo.Name = "tbTo";
-            this.tbTo.ReadOnly = true;
-            this.tbTo.Size = new System.Drawing.Size(792, 20);
-            this.tbTo.TabIndex = 3;
-            // 
             // btnReorder
             // 
             this.btnReorder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReorder.Location = new System.Drawing.Point(668, 84);
+            this.btnReorder.Location = new System.Drawing.Point(668, 56);
             this.btnReorder.Name = "btnReorder";
             this.btnReorder.Size = new System.Drawing.Size(136, 29);
             this.btnReorder.TabIndex = 4;
@@ -99,11 +76,11 @@
             this.tbResult.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbResult.Location = new System.Drawing.Point(12, 119);
+            this.tbResult.Location = new System.Drawing.Point(12, 91);
             this.tbResult.Multiline = true;
             this.tbResult.Name = "tbResult";
             this.tbResult.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbResult.Size = new System.Drawing.Size(873, 365);
+            this.tbResult.Size = new System.Drawing.Size(873, 392);
             this.tbResult.TabIndex = 5;
             // 
             // flowLayoutPanel1
@@ -111,7 +88,7 @@
             this.flowLayoutPanel1.Controls.Add(this.chbMove);
             this.flowLayoutPanel1.Controls.Add(this.chbMachine);
             this.flowLayoutPanel1.Controls.Add(this.chbDebug);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 84);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 56);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(301, 29);
             this.flowLayoutPanel1.TabIndex = 6;
@@ -140,15 +117,6 @@
             this.chbMachine.Text = "Gépenként külön";
             this.chbMachine.UseVisualStyleBackColor = true;
             // 
-            // pgBarMain
-            // 
-            this.pgBarMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pgBarMain.Location = new System.Drawing.Point(319, 87);
-            this.pgBarMain.Name = "pgBarMain";
-            this.pgBarMain.Size = new System.Drawing.Size(343, 20);
-            this.pgBarMain.TabIndex = 2;
-            // 
             // chbDebug
             // 
             this.chbDebug.AutoSize = true;
@@ -161,17 +129,24 @@
             this.chbDebug.Text = "Részletek";
             this.chbDebug.UseVisualStyleBackColor = true;
             // 
+            // pgBarMain
+            // 
+            this.pgBarMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgBarMain.Location = new System.Drawing.Point(319, 59);
+            this.pgBarMain.Name = "pgBarMain";
+            this.pgBarMain.Size = new System.Drawing.Size(343, 20);
+            this.pgBarMain.TabIndex = 2;
+            // 
             // PhotoReorder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(897, 496);
+            this.ClientSize = new System.Drawing.Size(897, 495);
             this.Controls.Add(this.pgBarMain);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.tbResult);
             this.Controls.Add(this.btnReorder);
-            this.Controls.Add(this.tbTo);
-            this.Controls.Add(this.btnTo);
             this.Controls.Add(this.tbFrom);
             this.Controls.Add(this.btnFrom);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -189,8 +164,6 @@
 
         private System.Windows.Forms.Button btnFrom;
         private System.Windows.Forms.TextBox tbFrom;
-        private System.Windows.Forms.Button btnTo;
-        private System.Windows.Forms.TextBox tbTo;
         private System.Windows.Forms.Button btnReorder;
         private System.Windows.Forms.TextBox tbResult;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;

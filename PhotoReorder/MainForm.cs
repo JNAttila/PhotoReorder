@@ -74,8 +74,6 @@ namespace PhotoReorder
 
             if (string.IsNullOrEmpty(_pathFrom))
                 return;
-            if (string.IsNullOrEmpty(_pathTo))
-                return;
 
             btnReorder.Enabled = true;
         }
@@ -92,22 +90,7 @@ namespace PhotoReorder
 
             UpdateUI();
         }
-
-        /// <summary>
-        /// Célkönyvtár
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnTo_Click(object sender, EventArgs e)
-        {
-            // célkönyvtár megadás
-            SelectPath(out _pathTo);
-
-            tbTo.Text = _pathTo;
-
-            UpdateUI();
-        }
-
+        
         /// <summary>
         /// Könyvtár kiválasztása
         /// </summary>
