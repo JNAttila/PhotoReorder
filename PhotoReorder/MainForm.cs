@@ -163,7 +163,7 @@ namespace PhotoReorder
         private void AnalyseFiles()
         {
             // képelemző szál létrehozása
-            analyseThread = new Thread(new Threads.ThreadAnalyseFiles(_pathFrom, _pathTo,
+            analyseThread = new Thread(new Threads.ThreadAnalyseFiles(_pathFrom,
                 chbMachine.Checked, ref _eiList, ThreadFileType.IMAGE_JPG, ref tbResult,
                 this, ref pgBarMain, true).AnalyleFiles);
 

@@ -88,7 +88,9 @@ namespace PhotoReorder
         {
             _pgBar.BeginInvoke(new Action(() =>
             {
+                _pgBar.Minimum = 0;
                 _pgBar.Value = 0;
+                _pgBar.Step = 1;
             }));
         }
 

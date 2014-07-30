@@ -15,6 +15,8 @@ namespace PhotoReorder
 
     public class ExifInformer
     {
+        #region adattagok
+
         // byte adatok konvertálásához
         private ASCIIEncoding _encoder = new ASCIIEncoding();
 
@@ -25,12 +27,22 @@ namespace PhotoReorder
         private string _rawModel = "";
         private string _rawDate = "";
 
+        // vannak-e Exif adatok
+        bool _isExif;
+        public bool IsExif
+        {
+            get { return _isExif; }
+        }
+
+        #endregion adattagok
+        
         /// <summary>
         /// Létrehozás
         /// </summary>
         /// <param name="filePath">Feldolgozandó fájl</param>
         public ExifInformer(MyImage myImage)
         {
+            _isExif = false;
             _myImage = myImage;
             InitExifInfo(_myImage.FullFileName);
         }
@@ -53,7 +65,11 @@ namespace PhotoReorder
             if (!fi.Exists)
                 return;
 
+            // a beolvasott kép
             Bitmap image = null;
+
+            // nincs EXIF adat
+            _isExif = false;
 
             // adatok kinyerése
             try
@@ -79,6 +95,9 @@ namespace PhotoReorder
                     _myImage.FileName = fileNameArr[fileNameArr.Length - 1];
                 }
                 _myImage.PathSource = filePath;
+
+                // van EXIF adat
+                _isExif = true;
             }
             catch (Exception)
             {
@@ -95,17 +114,23 @@ namespace PhotoReorder
         /// <summary>
         /// Adatok kinyerése
         /// </summary>
-        public void CalcDatas(bool sortMachine)
+        public bool CalcDatas(bool sortMachine)
         {
+            // biztonsági ellenőrzés
+            if (!_isExif)
+                return false;
+
+            // a készítő eszköz típusa
             _myImage.Machine = _rawModel;
 
+            // létrehozás dátuma és ideje az egy adatból
             string _createdDate;
             string _createTime;
             GetDstParams(_rawDate, out _createdDate, out _createTime);
-
             _myImage.CreatedDate = _createdDate;
             _myImage.CreatedTime = _createTime;
 
+            // képfájl cél könyvtárának összeállítása
             if (!string.IsNullOrEmpty(_myImage.PathDestRoot))
             {
                 var di = new DirectoryInfo(_myImage.PathDestRoot);
@@ -118,6 +143,8 @@ namespace PhotoReorder
                         .ToString();
                 }
             }
+            
+            return true;
         }
 
         /// <summary>

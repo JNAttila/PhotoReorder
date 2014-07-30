@@ -13,6 +13,11 @@ namespace PhotoReorder.Threads
         #region tagváltozók
 
         /// <summary>
+        /// A forráskönyvtárban itt lesznek megtalálhatóak az átmozgatott fájlok
+        /// </summary>
+        const string _destPrefix = "__Album__";
+
+        /// <summary>
         /// az adatok begyűjtésének kezdeti könyvtára
         /// </summary>
         string _pathFrom;
@@ -69,26 +74,29 @@ namespace PhotoReorder.Threads
 
         #endregion tagváltozók
 
+        #region Interface
+
         /// <summary>
         /// Létrehozás
         /// </summary>
         /// <param name="pathFrom">fájlok keresésének kiindulási helye</param>
-        /// <param name="pathTo">fájlok másolásának cél gyökér könyvtára</param>
         /// <param name="byMachines">kell-e gépenként külön könyvtár</param>
         /// <param name="exifIL">képii információ listája</param>
         /// <param name="pattern">képkeresési minta</param>
         /// <param name="tbLog">log üzenetek ablaka</param>
         /// <param name="super">a létrehozóra egy referencia</param>
         /// <param name="isDdebug">szükséges-e részletes logolás</param>
-        public ThreadAnalyseFiles(string pathFrom, string pathTo, bool byMachines,
+        public ThreadAnalyseFiles(string pathFrom, bool byMachines,
             ref List<ExifInformer> exifIL, string pattern, ref TextBox tbLog, PhotoReorder super,
             ref ProgressBar pgBar, bool isDdebug = false)
         {
             _pathFrom = pathFrom;
-            _pathTo = pathTo;
+            _pathTo = pathFrom + "\\" + _destPrefix;
+
             _byMachines = byMachines;
             _exifInfoList = exifIL;
             _searchPattern = pattern;
+
             _logger = new ThreadLogger(ref tbLog, ref pgBar);
             _super = super;
             _debug = isDdebug;
@@ -131,7 +139,7 @@ namespace PhotoReorder.Threads
                 _exifInfoList.Add(new ExifInformer(new MyImage()
                 {
                     FullFileName = item.FullName,
-                    PathDestRoot = _pathTo
+                    PathDestRoot = _pathFrom
                 }
                 ));
 
@@ -140,12 +148,14 @@ namespace PhotoReorder.Threads
 
             if (_debug)
                 _logger.Log("  _  " + (fileCnt - lastFileCnt).ToString() + "db", true, false);
+            else
+                _logger.Log("", true, false);
 
             _logger.Log("Összes talált fájlok száma: " + fileCnt.ToString());
 
             // foolyamatjelző alapállapotba
             _logger.PgbReset();
-            _logger.PgbInit(fileCnt);
+            _logger.PgbInit(_exifInfoList.Count);
 
             // minden Exifinformer-nek elemzés
             foreach (var item in _exifInfoList)
@@ -178,8 +188,10 @@ namespace PhotoReorder.Threads
             _super.UpdateStartBtn(false);
         }
 
+        #endregion Interface
+
         /// <summary>
-        /// Fotó album alapbaállítás
+        /// Fotó album alapba állítás
         /// </summary>
         private void InitFotoDict()
         {
@@ -261,6 +273,10 @@ namespace PhotoReorder.Threads
                     // folyamat kijelzés
                     _logger.PgbStep();
 
+                    // EXIF adat nélkül kihagyás
+                    if (!item.IsExif)
+                        continue;
+
                     // bejegyzés a fotóalbum megfelelő listájába
                     var dictVal = item._myImage.CreatedTime + "_" + item._myImage.Size;
 
@@ -305,6 +321,7 @@ namespace PhotoReorder.Threads
                         }
                     }
 
+#warning A másolás helyett mozgatás kell
                     File.Copy(item._myImage.FullFileName, fullNewFileName);
 
                     fileCnt = 0;
