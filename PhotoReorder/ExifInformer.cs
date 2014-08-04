@@ -35,7 +35,7 @@ namespace PhotoReorder
         }
 
         #endregion adattagok
-        
+
         /// <summary>
         /// Létrehozás
         /// </summary>
@@ -152,7 +152,7 @@ namespace PhotoReorder
                         .ToString();
                 }
             }
-            
+
             return true;
         }
 

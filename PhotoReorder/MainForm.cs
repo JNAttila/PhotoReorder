@@ -18,16 +18,9 @@ namespace PhotoReorder
 
         // képek forrása
         private string _pathFrom;
-        // képek cél könyvtára
-        private string _pathTo;
 
         // adatoka gyűjtő sora
         public List<ExifInformer> _eiList = new List<ExifInformer>();
-
-        // másolt fájlok
-        int fileCopied;
-        // kihagyott fájlok
-        int fileCancelled;
 
         /// <summary>
         /// Naplózást végző objektum
@@ -90,7 +83,7 @@ namespace PhotoReorder
 
             UpdateUI();
         }
-        
+
         /// <summary>
         /// Könyvtár kiválasztása
         /// </summary>
@@ -148,7 +141,7 @@ namespace PhotoReorder
             // képelemző szál létrehozása
             analyseThread = new Thread(new Threads.ThreadAnalyseFiles(_pathFrom,
                 chbMachine.Checked, ref _eiList, ThreadFileType.IMAGE_JPG, ref tbResult,
-                this, ref pgBarMain, true).AnalyleFiles);
+                this, ref pgBarMain, chbDebug.Checked, chbDelDuplicated.Checked).AnalyleFiles);
 
             // képelemzés indítása
             analyseThread.Start();

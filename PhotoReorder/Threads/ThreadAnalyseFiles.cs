@@ -33,6 +33,11 @@ namespace PhotoReorder.Threads
         bool _byMachines;
 
         /// <summary>
+        /// Duplikált képek legyenek-e törölve
+        /// </summary>
+        bool _delDuplic;
+
+        /// <summary>
         /// képi infpormációk gyűjtő helye
         /// </summary>
         List<ExifInformer> _exifInfoList;
@@ -88,7 +93,7 @@ namespace PhotoReorder.Threads
         /// <param name="isDdebug">szükséges-e részletes logolás</param>
         public ThreadAnalyseFiles(string pathFrom, bool byMachines,
             ref List<ExifInformer> exifIL, string pattern, ref TextBox tbLog, PhotoReorder super,
-            ref ProgressBar pgBar, bool isDdebug = false)
+            ref ProgressBar pgBar, bool isDdebug = false, bool delDuplic = false)
         {
             _pathFrom = pathFrom;
             _pathTo = pathFrom + "\\" + _destPrefix;
@@ -100,6 +105,7 @@ namespace PhotoReorder.Threads
             _logger = new ThreadLogger(ref tbLog, ref pgBar);
             _super = super;
             _debug = isDdebug;
+            _delDuplic = delDuplic;
         }
 
         /// <summary>
@@ -123,12 +129,21 @@ namespace PhotoReorder.Threads
             // végig minden fájlon
             foreach (var item in di.EnumerateFiles(_searchPattern, SearchOption.AllDirectories))
             {
+                // a célkönyvtárban ilyenkor ne keressen
+                var destFolder = item.DirectoryName.Contains(_pathTo);
+                if (destFolder)
+                    continue;
+
                 if (lastDir != item.DirectoryName)
                 {
                     if (_debug && fileCnt != lastFileCnt)
                     {
                         _logger.Log("  _  " + (fileCnt - lastFileCnt).ToString() + "db", true, false);
                         lastFileCnt = fileCnt;
+                    }
+                    else
+                    {
+                        _logger.Log("", true, false);
                     }
 
                     lastDir = item.DirectoryName;
@@ -146,7 +161,8 @@ namespace PhotoReorder.Threads
                 ++fileCnt;
             }
 
-            if (_debug)
+            // ha talált fájlokat egyáltalán
+            if (_debug || fileCnt > 0)
                 _logger.Log("  _  " + (fileCnt - lastFileCnt).ToString() + "db", true, false);
             else
                 _logger.Log("", true, false);
@@ -291,8 +307,18 @@ namespace PhotoReorder.Threads
                     {
                         // egyel több kihagyott fájl 
                         ++fileCancelled;
-                        // melyik volt az a fájl
-                        _logger.Log("Kihagyva: " + item._myImage.PathSource);
+
+                        if (_debug)
+                        {
+                            // melyik volt az a fájl
+                            _logger.Log("Kihagyva: " + item._myImage.PathSource);
+                        }
+
+                        // ha kell, duplikált kép törlése
+                        if (_delDuplic)
+                        {
+                            File.Delete(item._myImage.PathSource);
+                        }
 
                         // már van ilyen fájl mehetünk tovább
                         continue;
