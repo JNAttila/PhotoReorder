@@ -146,13 +146,19 @@ namespace PhotoReorder.Threads
                 // a könyvtár minden érdekes fájlja
                 for (int i = 0; i < subFiles.Length; ++i)
                 {
-                    // képadat elemzéshez listában tárolás
-                    _exifInfoList.Add(new ExifInformer(new MyImage()
+                    // képadat kinyeréshez objektum
+                    var newItem = new ExifInformer(new MyImage()
                     {
                         FullFileName = subFiles[i].FullName,
                         PathDestRoot = _pathFrom + '\\' + _destPrefix
                     }
-                    ));
+                    );
+
+                    // képi információk elemzése
+                    newItem.CalcDatas(_byMachines);
+
+                    // listában tárolás
+                    _exifInfoList.Add(newItem);
 
                     // folyamatjelző
                     _logger.PgbStep();
@@ -166,24 +172,6 @@ namespace PhotoReorder.Threads
 
             _logger.PgbReset();
             _logger.Log("Összes talált fájlok száma: " + fileCnt.ToString());
-
-            // folyamatjelző készítése az új körre
-            _logger.PgbInit(_exifInfoList.Count);
-
-            // minden Exifinformer-nek elemzés
-            foreach (var item in _exifInfoList)
-            {
-                // elemzés
-                item.CalcDatas(_byMachines);
-
-                // folyamat állapot kijelzés
-                _logger.PgbStep();
-            }
-
-            _logger.Log("Adatok előkészítve" + ((_debug) ? (": " + _exifInfoList.Count.ToString() + "db fájl") : ("")));
-
-            // folyamatjelző újra alapállapotba
-            _logger.PgbReset();
 
             // meglévő képekből fotóalbum építése
             DiscoverDestFolder();
