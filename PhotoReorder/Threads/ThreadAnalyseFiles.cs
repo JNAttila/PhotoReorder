@@ -122,55 +122,52 @@ namespace PhotoReorder.Threads
 
             // könyvtárak számlálója
             int fileCnt = 0;
-            // utolsó elemzett könyvtár neve
-            string lastDir = "";
-            int lastFileCnt = 0;
 
+            DirectoryInfo subDir;
             // végig minden fájlon
-            foreach (var item in di.EnumerateFiles(_searchPattern, SearchOption.AllDirectories))
+            foreach (var item in di.EnumerateDirectories("*", SearchOption.AllDirectories))
             {
+                // infó az aktuális könyvtárról
+                subDir = new DirectoryInfo(item.FullName);
+
                 // a célkönyvtárban ilyenkor ne keressen
-                var destFolder = item.DirectoryName.Contains(_pathTo);
+                var destFolder = item.FullName.Contains(_pathTo);
                 if (destFolder)
                     continue;
 
-                if (lastDir != item.DirectoryName)
-                {
-                    if (_debug && fileCnt != lastFileCnt)
-                    {
-                        _logger.Log("  _  " + (fileCnt - lastFileCnt).ToString() + "db", true, false);
-                        lastFileCnt = fileCnt;
-                    }
-                    else
-                    {
-                        _logger.Log("", true, false);
-                    }
+                // fájl lista a keresési minta szerint a könyvtárban
+                var subFiles = subDir.GetFiles(_searchPattern, SearchOption.TopDirectoryOnly);
+                // progressbar iniciaizálás
+                _logger.PgbReset();
+                _logger.PgbInit(subFiles.Length);
 
-                    lastDir = item.DirectoryName;
-                    _logger.Log("Könyvtár: " + lastDir, false);
+                _logger.Log("Könyvtár: " + item.FullName, false);
+
+                // a könyvtár minden érdekes fájlja
+                for (int i = 0; i < subFiles.Length; ++i)
+                {
+                    // képadat elemzéshez listában tárolás
+                    _exifInfoList.Add(new ExifInformer(new MyImage()
+                    {
+                        FullFileName = subFiles[i].FullName,
+                        PathDestRoot = _pathFrom + '\\' + _destPrefix
+                    }
+                    ));
+
+                    // folyamatjelző
+                    _logger.PgbStep();
+
+                    // össz fájl darabszám
+                    ++fileCnt;
                 }
 
-                // listában tárolás
-                _exifInfoList.Add(new ExifInformer(new MyImage()
-                {
-                    FullFileName = item.FullName,
-                    PathDestRoot = _pathFrom + '\\' + _destPrefix
-                }
-                ));
-
-                ++fileCnt;
+                _logger.Log((_debug) ? ("  -  " + subFiles.Length.ToString() + "db") : (""), true, false);
             }
 
-            // ha talált fájlokat egyáltalán
-            if (_debug || fileCnt > 0)
-                _logger.Log("  _  " + (fileCnt - lastFileCnt).ToString() + "db", true, false);
-            else
-                _logger.Log("", true, false);
-
+            _logger.PgbReset();
             _logger.Log("Összes talált fájlok száma: " + fileCnt.ToString());
 
-            // foolyamatjelző alapállapotba
-            _logger.PgbReset();
+            // folyamatjelző készítése az új körre
             _logger.PgbInit(_exifInfoList.Count);
 
             // minden Exifinformer-nek elemzés
@@ -182,6 +179,8 @@ namespace PhotoReorder.Threads
                 // folyamat állapot kijelzés
                 _logger.PgbStep();
             }
+
+            _logger.Log("Adatok előkészítve" + ((_debug) ? (": " + _exifInfoList.Count.ToString() + "db fájl") : ("")));
 
             // folyamatjelző újra alapállapotba
             _logger.PgbReset();
@@ -233,33 +232,62 @@ namespace PhotoReorder.Threads
 
             InitFotoDict();
 
-            // végig minden fájlon
-            foreach (var item in di.EnumerateFiles(_searchPattern, SearchOption.AllDirectories))
+            // folyamat kijelzés a felületre
+            _logger.Log("Meglévő képek elemzése", false);
+
+            // a cél könyvtárban
+            foreach (var dir in di.EnumerateDirectories("*", SearchOption.AllDirectories))
             {
-                var ei = new ExifInformer(new MyImage()
+                // végig minden könyvtáron
+                var subDir = new DirectoryInfo(dir.FullName);
+                // alkönyvtár beli fájlok
+                var subDirFiles = subDir.GetFiles(_searchPattern, SearchOption.TopDirectoryOnly);
+
+                // folyamatjelző beállítása
+                _logger.PgbReset();
+                _logger.PgbInit(subDirFiles.Length);
+
+                // végig minden alkönyvtár beli fájlon
+                for (int i = 0; i < subDirFiles.Length; ++i)
                 {
-                    FullFileName = item.FullName
-                }
-                );
-                ei.CalcDatas(_byMachines);
+                    var ei = new ExifInformer(new MyImage()
+                        {
+                            FullFileName = subDirFiles[i].FullName
+                        }
+                    );
+                    ei.CalcDatas(_byMachines);
 
-                // bejegyzés a fotóalbum megfelelő listájába
-                var dictVal = ei._myImage.CreatedTime + "_" + item.Length;
+                    // bejegyzés a fotóalbum megfelelő listájába
+                    // a képet azonosítja a létrehozás időpontjával és a fájl méretével
+                    var dictVal = ei._myImage.CreatedTime + "_" + subDirFiles[i].Length;
 
-                // fotóalbum elérési út
-                var dictKey = _pathTo + ((_byMachines) ? ("\\" + ei._myImage.Machine) : ("")) +
-                    "\\" + ei._myImage.CreatedDate;
+                    // fotóalbum elérési út
+                    // a kép besorolását a fényképezőgép típusa és a létrehozás dátuma adja
+                    var dictKey = _pathTo + ((_byMachines) ? ("\\" + ei._myImage.Machine) : ("")) +
+                        "\\" + ei._myImage.CreatedDate;
 
-                if (!_dict.ContainsKey(dictKey))
-                {
-                    _dict.Add(dictKey, new List<string>());
-                }
+                    // "adott géppel ezen a napon" van-e már kép
+                    if (!_dict.ContainsKey(dictKey))
+                    {
+                        _dict.Add(dictKey, new List<string>());
+                    }
 
-                if (!_dict[dictKey].Contains(dictVal))
-                {
-                    _dict[dictKey].Add(dictVal);
+                    // "a géppel aznap készített egy újabb kép"
+                    if (!_dict[dictKey].Contains(dictVal))
+                    {
+                        _dict[dictKey].Add(dictVal);
+                    }
+
+                    // folyamatjelző léptetése
+                    _logger.PgbStep();
                 }
             }
+
+            // vége a folyamatnak
+            _logger.Log("  -  OK", true, false);
+
+            // folyamatjelző alap állapotba
+            _logger.PgbReset();
         }
 
         /// <summary>
